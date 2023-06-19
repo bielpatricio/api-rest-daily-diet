@@ -109,10 +109,6 @@ For the project, some routes were created:
               "id": "ffa20cb0-a010-4aae-976a-91070cb779b6",
               "username": "bieu",
               "email": "bieu@gmail.com",
-              "password": "123",
-              "created_at": "2023-06-19 17:14:55",
-              "updated_at": "2023-06-19 17:47:51",
-              "session_id": "93d3e512-32be-45ae-b055-7e704ff2ce13"
           }
       }
 
@@ -126,10 +122,10 @@ For the project, some routes were created:
     (POST) http://localhost:3333/meals
     1.1 body
       {
-          "username": "bieu",
-          "email": "bieu@gmail.com",
-          "password": "123",
-          "confirmPassword": "123"
+          "name": "jantar",
+          "description": "ovos e cuscuz",
+          "inDiet": true,
+          "date": "{{currentdate}}"
       }
 
   2. Put a meal
@@ -153,9 +149,9 @@ For the project, some routes were created:
           "name": "Cafe",
           "description": "ovos e mamão",
           "date": "2023-06-19T15:42:11-03:00",
-          "inDiet": 1,
-          "created_at": "2023-06-19 17:15:12",
-          "updated_at": "2023-06-19 18:42:11"
+          "inDiet": true,
+          "createdAt": "2023-06-19 17:15:12",
+          "updatedAt": "2023-06-19 18:42:11"
       }
 
   4. Get all meals
@@ -172,19 +168,19 @@ For the project, some routes were created:
                     "name": "Cafe",
                     "description": "ovos e mamão",
                     "date": "2023-06-19T15:42:11-03:00",
-                    "inDiet": 1,
-                    "created_at": "2023-06-19 17:15:12",
-                    "updated_at": "2023-06-19 18:42:11"
+                    "inDiet": true,
+                    "createdAt": "2023-06-19 17:15:12",
+                    "updatedAt": "2023-06-19 18:42:11"
                 },
                 {
                     "id": "8323b7c9-4c7a-4871-97ce-614239d96b79",
                     "session_id": "93d3e512-32be-45ae-b055-7e704ff2ce13",
                     "name": "janta",
-                    "description": "ovo com cuscuz",
+                    "description": "ovo com bacon",
                     "date": "2023-06-19T14:15:21-03:00",
-                    "inDiet": 1,
-                    "created_at": "2023-06-19 17:15:21",
-                    "updated_at": "2023-06-19 17:47:51"
+                    "inDiet": false,
+                    "createdAt": "2023-06-19 17:15:21",
+                    "updatedAt": "2023-06-19 17:47:51"
                 },
             ]
         }
