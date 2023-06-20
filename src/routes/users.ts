@@ -3,6 +3,8 @@ import { knex } from '../database'
 import crypto, { randomUUID } from 'node:crypto'
 import { z } from 'zod'
 import { User } from '../@types/user'
+import { checkSessionIdExists } from '../middlewares/check-session-id-exists'
+import moment from 'moment'
 
 export async function UsersRoutes(app: FastifyInstance) {
   app.post('/', async (request, reply) => {
@@ -56,6 +58,60 @@ export async function UsersRoutes(app: FastifyInstance) {
 
     return reply.status(201).send()
   })
+
+  app.get(
+    '/',
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request, reply) => {
+      const { sessionId } = request.cookies
+
+      const meals = await knex('meals').where('session_id', sessionId).select()
+      const mealsInDiet = meals.filter((meal) => meal.inDiet)
+      const mealsOutDiet = meals.filter((meal) => !meal.inDiet)
+
+      const user = await knex('users')
+        .where('session_id', sessionId)
+        .select()
+        .first()
+
+      const mealsSequence = meals.reduce(
+        (count, meal) => {
+          if (meal.inDiet) {
+            count.sequence++
+          }
+          if (!meal.inDiet) {
+            if (count.sequence > count.total) {
+              count.total = count.sequence
+            }
+            count.sequence = 0
+          }
+
+          return count
+        },
+        {
+          total: 0,
+          sequence: 0,
+        },
+      )
+
+      return {
+        total: meals.length,
+        totalInDiet: mealsInDiet.length,
+        totalOutDiet: mealsOutDiet.length,
+        BestSequence:
+          mealsSequence.sequence > mealsSequence.total
+            ? mealsSequence.sequence
+            : mealsSequence.total,
+        user: {
+          id: user?.id,
+          username: user?.username,
+          email: user?.email,
+        },
+      }
+    },
+  )
 
   app.put('/login', async (request, reply) => {
     const loginUserSchema = z
@@ -122,17 +178,20 @@ export async function UsersRoutes(app: FastifyInstance) {
       })
     }
 
-    let sessionId = request.cookies.sessionId
+    const sessionId = randomUUID()
 
-    if (!sessionId) {
-      sessionId = randomUUID()
+    reply.cookie('sessionId', sessionId, {
+      path: '/',
+      maxAge: 1000 * 60 * 60 * 24, // 1 days
+    })
 
-      reply.cookie('sessionId', sessionId, {
-        path: '/',
-        // maxAge: 1000 * 60 * 60 * 24, // 1 days
-        maxAge: 1000 * 5, // 5 second
-      })
-    }
+    await knex('meals').where({ session_id: user.session_id }).update(
+      {
+        session_id: sessionId,
+        updated_at: knex.fn.now(),
+      },
+      ['id', 'session_id', 'updated_at'],
+    )
 
     await knex('users').where({ id: user.id }).update(
       {
