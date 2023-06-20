@@ -68,7 +68,8 @@ $ npm i
 $ npm run dev
 # The application will runing on port 3333, so you can access the url http://localhost:3333/ to do the requests.
 # Run the tests
-$ npm test
+$ npm test:users
+$ npm test:meals
 ```
 
 # Routes
